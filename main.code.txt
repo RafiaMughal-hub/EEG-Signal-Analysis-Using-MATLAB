@@ -1,0 +1,116 @@
+clear
+clc
+close all
+
+disp('===================================')
+disp(' EEG SIGNAL ANALYSIS PROJECT')
+disp('===================================')
+
+%% Analyze Healthy EEG Files
+
+disp('Analyzing Healthy EEG 1...')
+healthy1 = analyzeEEG('../Data/Healthy/S001R01.edf',true);
+
+disp('Analyzing Healthy EEG 2...')
+healthy2 = analyzeEEG('../Data/Healthy/S001R02.edf',false);
+
+disp('Analyzing Healthy EEG 3...')
+healthy3 = analyzeEEG('../Data/Healthy/S001R03.edf',false);
+
+%% Analyze Epilepsy EEG File
+
+disp('Analyzing Epilepsy EEG...')
+epilepsy1 = analyzeEEG('../Data/Epilepsy/chb01_03.edf',false);
+
+%% Create Comparison Table
+
+File = {'Healthy1';'Healthy2';'Healthy3';'Epilepsy'};
+
+Delta = [healthy1.delta;
+         healthy2.delta;
+         healthy3.delta;
+         epilepsy1.delta];
+
+Theta = [healthy1.theta;
+         healthy2.theta;
+         healthy3.theta;
+         epilepsy1.theta];
+
+Alpha = [healthy1.alpha;
+         healthy2.alpha;
+         healthy3.alpha;
+         epilepsy1.alpha];
+
+Beta = [healthy1.beta;
+        healthy2.beta;
+        healthy3.beta;
+        epilepsy1.beta];
+
+Gamma = [healthy1.gamma;
+         healthy2.gamma;
+         healthy3.gamma;
+         epilepsy1.gamma];
+
+Results = table(File,Delta,Theta,Alpha,Beta,Gamma)
+
+disp('===================================')
+disp('Analysis Complete')
+disp('===================================')
+
+%% Save Results to Excel
+
+writetable(Results,'EEG_Comparison_Results.xlsx');
+
+disp('Results saved to EEG_Comparison_Results.xlsx');
+
+%% ======================================================
+% Figure 10 : Healthy vs Epilepsy Comparison
+%% ======================================================
+
+figure('Name','Healthy vs Epilepsy Comparison')
+
+bar([mean(Delta(1:3)) Delta(4);
+     mean(Theta(1:3)) Theta(4);
+     mean(Alpha(1:3)) Alpha(4);
+     mean(Beta(1:3)) Beta(4);
+     mean(Gamma(1:3)) Gamma(4)])
+
+title('Average Healthy vs Epilepsy Brain Wave Powers')
+
+xlabel('Brain Waves')
+
+ylabel('Power')
+
+legend('Healthy Average','Epilepsy')
+
+set(gca,'XTickLabel',{'Delta','Theta','Alpha','Beta','Gamma'})
+
+grid on
+
+disp(' ')
+disp('======================================')
+disp('EEG PROJECT COMPLETED SUCCESSFULLY')
+disp('Healthy EEG Files Analyzed : 3')
+disp('Epilepsy EEG Files Analyzed: 1')
+disp('======================================')
+
+%% ======================================================
+% Save Figures Automatically
+%% ======================================================
+
+figureNames = {
+    'Healthy_RawEEG'
+    'Healthy_FilteredEEG'
+    'Healthy_BrainWaves'
+    'Healthy_FFT'
+    'Healthy_vs_Epilepsy'
+    };
+
+figs = findall(0,'Type','figure');
+figs = flipud(figs);
+
+for k = 1:min(length(figs),length(figureNames))
+    saveas(figs(k),[figureNames{k} '.png']);
+end
+
+disp('All figures saved successfully.')
